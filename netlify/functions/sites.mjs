@@ -9,6 +9,13 @@ const BASE = "https://api.jsonbin.io/v3/b/";
 const headers = { "content-type": "application/json", "cache-control": "no-store" };
 const json = (data, status = 200) => new Response(JSON.stringify(data), { status, headers });
 
+// The list itself may be cached by Netlify's CDN for 30 seconds, so most visits never wait on JSONBin.
+const listHeaders = {
+  "content-type": "application/json",
+  "cache-control": "public, max-age=0, must-revalidate",
+  "netlify-cdn-cache-control": "public, s-maxage=30",
+};
+
 function codeOk(input) {
   const real = process.env.ADMIN_CODE || "";
   if (!real || typeof input !== "string") return false;
@@ -46,19 +53,29 @@ function clean(list) {
 }
 
 async function readSites() {
-  const r = await fetch(`${BASE}${process.env.JSONBIN_ID}/latest`, {
-    headers: { "X-Master-Key": process.env.JSONBIN_KEY, "X-Bin-Meta": "false" },
-  });
-  if (!r.ok) throw new Error("read failed " + r.status);
-  const data = await r.json();
-  const rec = data && data.record ? data.record : data;
-  return Array.isArray(rec?.sites) ? rec.sites : [];
+  let lastError;
+  for (let attempt = 0; attempt < 2; attempt++) {
+    try {
+      const r = await fetch(`${BASE}${process.env.JSONBIN_ID}/latest`, {
+        headers: { "X-Master-Key": process.env.JSONBIN_KEY, "X-Bin-Meta": "false" },
+        signal: AbortSignal.timeout(4000),
+      });
+      if (!r.ok) throw new Error("read failed " + r.status);
+      const data = await r.json();
+      const rec = data && data.record ? data.record : data;
+      return Array.isArray(rec?.sites) ? rec.sites : [];
+    } catch (e) {
+      lastError = e;
+    }
+  }
+  throw lastError;
 }
 
 async function writeSites(sites) {
   const r = await fetch(`${BASE}${process.env.JSONBIN_ID}`, {
     method: "PUT",
     headers: { "content-type": "application/json", "X-Master-Key": process.env.JSONBIN_KEY },
+    signal: AbortSignal.timeout(8000),
     body: JSON.stringify({ sites }),
   });
   if (!r.ok) throw new Error("write failed " + r.status);
@@ -71,7 +88,7 @@ export default async (req) => {
 
   if (req.method === "GET") {
     try {
-      return json({ sites: await readSites() });
+      return new Response(JSON.stringify({ sites: await readSites() }), { status: 200, headers: listHeaders });
     } catch {
       return json({ error: "Couldn't load the list." }, 502);
     }
