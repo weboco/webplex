@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>My Websites</title>
+<meta name="description" content="A little collection of websites I made.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🫧</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --lime: #c9f53d;
+    --mint: #b9f5c8;
+    --butter: #fff48f;
+    --ink: #1d4a2a;
+    --green: #237a3f;
+    --green-deep: #17552b;
+    --pink: #ffd3e0;
+    --white: #ffffff;
+    --shadow: 0 10px 0 rgba(35, 122, 63, .16);
+  }
+  * { box-sizing: border-box; }
+  html { min-height: 100%; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: "Fredoka", "Nunito", "Trebuchet MS", system-ui, sans-serif;
+    color: var(--ink);
+    background: linear-gradient(145deg, var(--lime) 0%, var(--mint) 50%, var(--butter) 100%);
+    background-attachment: fixed;
+    overflow-x: hidden;
+    padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom);
+  }
+
+  /* floating bubbles */
+  .bubbles { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
+  .bubbles i {
+    position: absolute; bottom: -120px; border-radius: 50%;
+    background: radial-gradient(circle at 30% 28%, rgba(255,255,255,.95) 0 10%, rgba(255,255,255,.35) 11% 60%, rgba(255,255,255,.12) 100%);
+    border: 3px solid rgba(255,255,255,.7);
+    animation: rise linear infinite;
+  }
+  @keyframes rise { to { transform: translateY(-120vh) translateX(30px); } }
+  @media (prefers-reduced-motion: reduce) {
+    .bubbles i { animation: none; bottom: auto; }
+    * { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+  }
+
+  main { position: relative; z-index: 1; max-width: 1040px; margin: 0 auto; padding: 48px 20px 120px; }
+
+  .hero { text-align: center; padding: 48px 0 24px; }
+  .hero h1 { font-size: clamp(2.2rem, 7vw, 3.6rem); margin: 0 0 10px; font-weight: 700; letter-spacing: -.5px; }
+  .hero p { margin: 0 0 34px; font-size: 1.2rem; font-weight: 500; opacity: .85; }
+
+  .big-btn {
+    font: inherit; font-weight: 700; font-size: clamp(1.6rem, 6vw, 2.4rem);
+    color: var(--white); background: var(--green);
+    border: 0; border-radius: 999px; padding: 18px 46px; cursor: pointer;
+    box-shadow: inset 0 6px 0 rgba(255,255,255,.3), inset 0 -6px 0 rgba(0,0,0,.12), 0 9px 0 var(--green-deep), 0 22px 30px rgba(35,122,63,.25);
+    transition: transform .15s ease, box-shadow .15s ease;
+    animation: wobble 4s ease-in-out infinite;
+  }
+  @keyframes wobble { 0%, 88%, 100% { transform: rotate(0) } 91% { transform: rotate(-3deg) } 94% { transform: rotate(3deg) } 97% { transform: rotate(-2deg) } }
+  .big-btn:hover { transform: translateY(-3px) scale(1.03); animation: none; }
+  .big-btn:active { transform: translateY(7px); box-shadow: inset 0 6px 0 rgba(255,255,255,.3), inset 0 -6px 0 rgba(0,0,0,.12), 0 2px 0 var(--green-deep); }
+
+  button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visible {
+    outline: 4px solid var(--ink); outline-offset: 3px;
+  }
+
+  /* gallery */
+  #gallery { margin-top: 40px; }
+  #gallery[hidden] { display: none; }
+  .gallery-in { animation: pop .45s cubic-bezier(.3, 1.6, .5, 1); }
+  @keyframes pop { from { transform: scale(.85); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+  .admin-bar {
+    display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: center;
+    background: rgba(255,255,255,.65); border: 4px solid var(--white); border-radius: 40px;
+    padding: 16px 20px; margin-bottom: 28px;
+  }
+  .admin-bar[hidden] { display: none; }
+  .admin-bar span { font-weight: 600; }
+
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 26px; }
+
+  .card {
+    background: rgba(255,255,255,.82); border: 5px solid var(--white); border-radius: 44px;
+    padding: 24px 22px 22px; box-shadow: var(--shadow);
+    display: flex; flex-direction: column; gap: 10px; align-items: flex-start;
+    transition: transform .2s cubic-bezier(.3, 1.6, .5, 1);
+  }
+  .card:hover { transform: translateY(-6px) rotate(-.6deg); }
+  .emoji {
+    width: 76px; height: 76px; border-radius: 50%; display: grid; place-items: center;
+    font-size: 2.3rem; background: var(--tint, var(--mint));
+    box-shadow: inset 0 5px 0 rgba(255,255,255,.7), inset 0 -5px 0 rgba(0,0,0,.06);
+  }
+  .card h2 { margin: 4px 0 0; font-size: 1.45rem; font-weight: 600; overflow-wrap: anywhere; }
+  .card p { margin: 0; font-size: 1.02rem; line-height: 1.4; opacity: .85; overflow-wrap: anywhere; }
+  .card .spacer { flex: 1; }
+
+  .pill {
+    font: inherit; font-weight: 600; font-size: 1.05rem; text-decoration: none; cursor: pointer;
+    color: var(--ink); background: var(--butter); border: 0; border-radius: 999px; padding: 10px 22px;
+    box-shadow: inset 0 4px 0 rgba(255,255,255,.6), 0 5px 0 rgba(29,74,42,.18);
+    transition: transform .12s ease, box-shadow .12s ease; display: inline-block;
+  }
+  .pill:hover { transform: translateY(-2px); }
+  .pill:active { transform: translateY(4px); box-shadow: inset 0 4px 0 rgba(255,255,255,.6), 0 1px 0 rgba(29,74,42,.18); }
+  .pill.green { background: var(--green); color: var(--white); box-shadow: inset 0 4px 0 rgba(255,255,255,.3), 0 5px 0 var(--green-deep); }
+  .pill.pink { background: var(--pink); }
+  .pill.small { padding: 6px 14px; font-size: .95rem; }
+
+  .tools { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 6px; }
+
+  .empty {
+    grid-column: 1 / -1; text-align: center; font-size: 1.25rem; font-weight: 500;
+    background: rgba(255,255,255,.7); border: 5px solid var(--white); border-radius: 44px; padding: 36px 20px;
+  }
+
+  /* admin key */
+  .key {
+    position: fixed; right: 18px; bottom: calc(18px + env(safe-area-inset-bottom)); z-index: 5;
+    width: 56px; height: 56px; border-radius: 50%; border: 4px solid var(--white); cursor: pointer;
+    background: rgba(255,255,255,.75); font-size: 1.5rem; box-shadow: 0 6px 0 rgba(35,122,63,.2);
+    transition: transform .15s ease;
+  }
+  .key:hover { transform: scale(1.1) rotate(-8deg); }
+
+  /* dialogs */
+  dialog {
+    border: 5px solid var(--white); border-radius: 40px; padding: 28px 26px 24px; max-width: 420px; width: calc(100% - 32px);
+    background: linear-gradient(160deg, #f4ffd0, #e2fbe9 60%, #fffbc4); color: var(--ink);
+    box-shadow: 0 20px 60px rgba(35,122,63,.35); font: inherit;
+  }
+  dialog::backdrop { background: rgba(35,122,63,.35); backdrop-filter: blur(4px); }
+  dialog[open] { animation: pop .35s cubic-bezier(.3, 1.6, .5, 1); }
+  dialog h3 { margin: 0 0 6px; font-size: 1.5rem; }
+  dialog p { margin: 0 0 16px; opacity: .85; }
+  label { display: block; font-weight: 600; margin: 12px 0 6px; }
+  input, textarea {
+    width: 100%; font: inherit; color: var(--ink); background: var(--white);
+    border: 3px solid #d9f2c4; border-radius: 22px; padding: 12px 16px;
+  }
+  textarea { resize: vertical; min-height: 84px; border-radius: 26px; }
+  input:focus, textarea:focus { border-color: var(--green); }
+  .row { display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap; }
+  .msg { min-height: 1.4em; margin: 10px 0 0; font-weight: 600; color: #b3244e; }
+
+  .toast {
+    position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom)); transform: translate(-50%, 140px);
+    background: var(--ink); color: var(--white); font-weight: 600; border-radius: 999px; padding: 12px 24px;
+    z-index: 20; transition: transform .35s cubic-bezier(.3, 1.6, .5, 1); max-width: calc(100% - 32px); text-align: center;
+  }
+  .toast.show { transform: translate(-50%, 0); }
+</style>
+</head>
+<body>
+<div class="bubbles" aria-hidden="true"></div>
+
+<main>
+  <section class="hero">
+    <h1>My websites</h1>
+    <p>A little collection of things I've made.</p>
+    <button class="big-btn" id="open" aria-expanded="false" aria-controls="gallery">Websites!!!</button>
+  </section>
+
+  <section id="gallery" hidden aria-label="My websites">
+    <div class="admin-bar" id="adminBar" hidden>
+      <span>Editing mode</span>
+      <button class="pill green" id="addBtn" type="button">Add a website</button>
+      <button class="pill pink" id="logoutBtn" type="button">Lock editing</button>
+    </div>
+    <div class="grid" id="grid"></div>
+  </section>
+</main>
+
+<button class="key" id="keyBtn" type="button" aria-label="Admin login" title="Admin">🔑</button>
+
+<dialog id="codeDlg">
+  <form id="codeForm">
+    <h3>Enter admin code</h3>
+    <p>Only you can change the list.</p>
+    <label for="code">Admin code</label>
+    <input id="code" type="password" autocomplete="current-password" required>
+    <p class="msg" id="codeMsg" role="alert"></p>
+    <div class="row">
+      <button class="pill green" type="submit">Unlock</button>
+      <button class="pill" type="button" data-close="codeDlg">Cancel</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog id="editDlg">
+  <form id="editForm">
+    <h3 id="editTitle">Add a website</h3>
+    <label for="fEmoji">Emoji</label>
+    <input id="fEmoji" maxlength="8" placeholder="🌈">
+    <label for="fName">Name</label>
+    <input id="fName" maxlength="60" required placeholder="My cool site">
+    <label for="fUrl">Web address</label>
+    <input id="fUrl" required inputmode="url" placeholder="https://example.com">
+    <label for="fDesc">Short description</label>
+    <textarea id="fDesc" maxlength="140" placeholder="What is it about?"></textarea>
+    <p class="msg" id="editMsg" role="alert"></p>
+    <div class="row">
+      <button class="pill green" type="submit" id="saveBtn">Save website</button>
+      <button class="pill" type="button" data-close="editDlg">Cancel</button>
+    </div>
+  </form>
+</dialog>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(() => {
+  const $ = (s) => document.querySelector(s);
+  const grid = $("#grid"), gallery = $("#gallery"), openBtn = $("#open");
+  const adminBar = $("#adminBar"), toastEl = $("#toast");
+  const tints = ["#e4fbc4", "#fff6b0", "#d6f5e3", "#ffe3ec"];
+
+  let sites = [];
+  let adminCode = null;   // kept in memory only
+  let editingId = null;
+  let loadFailed = false;
+
+  // bubbles
+  const bubbles = document.querySelector(".bubbles");
+  for (let i = 0; i < 12; i++) {
+    const b = document.createElement("i");
+    const size = 30 + Math.random() * 90;
+    b.style.width = b.style.height = size + "px";
+    b.style.left = Math.random() * 100 + "%";
+    b.style.animationDuration = 14 + Math.random() * 16 + "s";
+    b.style.animationDelay = -Math.random() * 20 + "s";
+    bubbles.appendChild(b);
+  }
+
+  function toast(text) {
+    toastEl.textContent = text;
+    toastEl.classList.add("show");
+    clearTimeout(toast.t);
+    toast.t = setTimeout(() => toastEl.classList.remove("show"), 2600);
+  }
+
+  function el(tag, cls, text) {
+    const e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (text != null) e.textContent = text;
+    return e;
+  }
+
+  function render() {
+    grid.replaceChildren();
+    if (!sites.length) {
+      grid.appendChild(el("div", "empty",
+        loadFailed ? "Couldn't load the websites. Refresh to try again."
+        : adminCode ? "No websites yet. Tap Add a website to start."
+        : "No websites here yet. Check back soon!"));
+      return;
+    }
+    sites.forEach((s, i) => {
+      const card = el("article", "card");
+      const em = el("div", "emoji", s.emoji || "🌐");
+      em.style.setProperty("--tint", tints[i % tints.length]);
+      card.append(em, el("h2", null, s.name));
+      if (s.desc) card.appendChild(el("p", null, s.desc));
+      card.appendChild(el("div", "spacer"));
+
+      const visit = el("a", "pill green", "Visit website");
+      visit.href = s.url; visit.target = "_blank"; visit.rel = "noopener noreferrer";
+      card.appendChild(visit);
+
+      if (adminCode) {
+        const tools = el("div", "tools");
+        const mk = (label, aria, fn, disabled) => {
+          const b = el("button", "pill small", label);
+          b.type = "button"; b.setAttribute("aria-label", aria); b.disabled = !!disabled;
+          b.addEventListener("click", fn); return b;
+        };
+        tools.append(
+          mk("‹", "Move earlier", () => move(i, -1), i === 0),
+          mk("Edit", "Edit " + s.name, () => openEdit(s)),
+          mk("Delete", "Delete " + s.name, () => remove(s)),
+          mk("›", "Move later", () => move(i, 1), i === sites.length - 1)
+        );
+        card.appendChild(tools);
+      }
+      grid.appendChild(card);
+    });
+  }
+
+  async function api(body) {
+    const r = await fetch("/api/sites", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify(body)
+    });
+    let data = {};
+    try { data = await r.json(); } catch {}
+    if (!r.ok) { const e = new Error(data.error || "Something went wrong"); e.status = r.status; throw e; }
+    return data;
+  }
+
+  async function load() {
+    try {
+      const r = await fetch("/api/sites", { cache: "no-store" });
+      if (!r.ok) throw new Error();
+      sites = (await r.json()).sites || [];
+      loadFailed = false;
+    } catch { loadFailed = true; }
+    render();
+  }
+
+  async function persist(next, okMsg) {
+    try {
+      const data = await api({ action: "save", code: adminCode, sites: next });
+      sites = data.sites;
+      render();
+      toast(okMsg);
+      return true;
+    } catch (e) {
+      if (e.status === 401) { lock(); toast("Wrong code. Editing is locked."); }
+      else toast(e.message);
+      return false;
+    }
+  }
+
+  const move = (i, d) => {
+    const next = sites.slice();
+    [next[i], next[i + d]] = [next[i + d], next[i]];
+    persist(next, "Order saved");
+  };
+  const remove = (s) => {
+    if (!confirm('Delete "' + s.name + '"?')) return;
+    persist(sites.filter((x) => x.id !== s.id), "Deleted");
+  };
+
+  function showGallery(show) {
+    gallery.hidden = !show;
+    openBtn.setAttribute("aria-expanded", String(show));
+    if (show) {
+      gallery.classList.remove("gallery-in"); void gallery.offsetWidth; gallery.classList.add("gallery-in");
+      gallery.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }
+  openBtn.addEventListener("click", () => showGallery(gallery.hidden));
+
+  // admin
+  const codeDlg = $("#codeDlg"), editDlg = $("#editDlg");
+  document.querySelectorAll("[data-close]").forEach((b) =>
+    b.addEventListener("click", () => document.getElementById(b.dataset.close).close()));
+
+  $("#keyBtn").addEventListener("click", () => {
+    if (adminCode) { showGallery(true); return; }
+    $("#codeMsg").textContent = ""; $("#code").value = "";
+    codeDlg.showModal(); $("#code").focus();
+  });
+
+  $("#codeForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const code = $("#code").value;
+    try {
+      await api({ action: "verify", code });
+      adminCode = code;
+      adminBar.hidden = false;
+      codeDlg.close();
+      if (gallery.hidden) showGallery(true);
+      render();
+      toast("Editing unlocked");
+    } catch (err) {
+      $("#codeMsg").textContent = err.status === 401 ? "That code isn't right. Try again." : err.message;
+    }
+  });
+
+  function lock() { adminCode = null; adminBar.hidden = true; render(); }
+  $("#logoutBtn").addEventListener("click", () => { lock(); toast("Editing locked"); });
+
+  function openEdit(s) {
+    editingId = s ? s.id : null;
+    $("#editTitle").textContent = s ? "Edit website" : "Add a website";
+    $("#fEmoji").value = s ? s.emoji : "";
+    $("#fName").value = s ? s.name : "";
+    $("#fUrl").value = s ? s.url : "";
+    $("#fDesc").value = s ? s.desc : "";
+    $("#editMsg").textContent = "";
+    editDlg.showModal(); $("#fName").focus();
+  }
+  $("#addBtn").addEventListener("click", () => openEdit(null));
+
+  $("#editForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    let url = $("#fUrl").value.trim();
+    if (!/^https?:\/\//i.test(url)) url = "https://" + url;
+    try { new URL(url); } catch { $("#editMsg").textContent = "That web address doesn't look right."; return; }
+    const item = {
+      id: editingId || (crypto.randomUUID ? crypto.randomUUID() : String(Date.now())),
+      emoji: $("#fEmoji").value.trim(),
+      name: $("#fName").value.trim(),
+      url,
+      desc: $("#fDesc").value.trim()
+    };
+    const next = editingId ? sites.map((x) => (x.id === editingId ? item : x)) : [...sites, item];
+    $("#saveBtn").disabled = true;
+    const ok = await persist(next, "Saved");
+    $("#saveBtn").disabled = false;
+    if (ok) editDlg.close();
+  });
+
+  load();
+})();
+</script>
+</body>
+</html>
